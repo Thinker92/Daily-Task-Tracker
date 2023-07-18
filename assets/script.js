@@ -1,31 +1,29 @@
-// Wrap all code that interacts with the DOM in a call to jQuery to ensure that
-// the code isn't run until the browser has finished rendering all the elements
-// in the html.
+// Waiting for HTML DOM to load before starting any code
 $(function () {
   let now = dayjs().format('MMMM DD, YYYY');
   $("#currentDay").text(now)
-  // TODO: Add a listener for click events on the save button. This code should
-  // use the id in the containing time-block as a key to save the user input in
-  // local storage. HINT: What does `this` reference in the click listener
-  // function? How can DOM traversal be used to get the "hour-x" id of the
-  // time-block containing the button that was clicked? How might the id be
-  // useful when saving the description in local storage?
-  
-  //
-  // TODO: Add code to apply the past, present, or future class to each time
-  // block by comparing the id to the current hour. HINTS: How can the id
-  // attribute of each time-block be used to conditionally add or remove the
-  // past, present, and future classes? How can Day.js be used to get the
-  // current hour in 24-hour time?
+
+  const saveBtn = $(".saveBtn");
+  saveBtn.on("click", function(event) {
+    event.preventDefault();
+    // Using ".siblings()" to pick any save button and get access to data faster
+    let hour = $(this).siblings(".hour").text();
+    console.log(hour);
+    let data = $(this).siblings(".description").val();
+    console.log(data)
+    localStorage.setItem(hour,data);
+
+  })
+
   function hourBlockFormatting() {
     // Get current time (HH){int}
     let hour = dayjs().hour();
-    console.log(hour);
+    // console.log(hour);
     // For each time block
     $(".time-block").each(function(){
       // get hour from HTML id
       let curHour = parseInt($(this).attr("id"));
-      console.log(curHour);
+      // console.log(curHour);
       // Determine past,present,or future and add class
       if (curHour > hour){
         $(this).addClass("future");
@@ -38,9 +36,18 @@ $(function () {
   }
 // Calling the formatting function
   hourBlockFormatting();
-  //
-  // TODO: Add code to get any user input that was saved in localStorage and set
-  // the values of the corresponding textarea elements. HINT: How can the id
-  // attribute of each time-block be used to do this?
+  
+  function getSavedItems() {
+    $(".hour").each(function () {
+      let currHour = $(this).text();
+      // console.log(currHour);
+      let currItem = localStorage.getItem(currHour);
+      // console.log(currItem);
 
+      if (currItem !== null){
+        $(this).siblings(".description").val(currItem);
+      }
+    })
+  }
+  getSavedItems();
 });
